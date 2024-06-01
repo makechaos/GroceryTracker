@@ -14,12 +14,13 @@ button {
   font-size:14;
 }
 .barBox {
-  border:1px solid #aa66ff;
+  border:1px solid #ffc300;
+  font-size:14px;
   float:left;
   position:absolute;
   display:block;
   width:10px;
-  background-color:#ff22ff;
+  background-color:#ffc300;
   height:10px;
   opacity:1.0;
   color:black;
@@ -55,13 +56,21 @@ function bar(elid,inp,len,opacity=1,width=10){
     stxt += 'opacity:'+opacity+';';
     stxt += 'width:'+width+'px;';
     node.setAttribute('style',stxt);
+    node.setAttribute('value',vals[m])
+    node.setAttribute('onclick','getValue(this)');
     el.appendChild(node);
   }
 }
 var prevEl = null;
 function getValue(el) {
-  if(prevEl!=null) prevEl.innerHTML = "";
+  if(prevEl!=null) {
+      prevEl.innerHTML = "";
+      prevEl.style.opacity = 0.2;
+      prevEl.style.backgroundColor = '#ffc300';
+  }
   el.innerHTML = el.getAttribute("value");
+  el.style.opacity = 1.0
+  el.style.backgroundColor = '#aaaaff';
   prevEl = el;
 }
 function verticalBar(elid,inp,maxN,height,len){
@@ -103,7 +112,7 @@ function loadAllBar(){
   for(var m=0;m<els.length;m++) {
     var id = els[m].getAttribute('id');
     var vals = els[m].getAttribute('barValues');
-    bar(id,vals.split(','),100,0.2,3);
+    bar(id,vals.split(','),100,0.3,3);
     //verticalBar(id,vals.split(','),5,20,100);
   }
 
