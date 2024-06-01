@@ -1,0 +1,227 @@
+<html>
+<head>
+<title>Mulitplication Practice</title>
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+body {
+	font-family: courier;
+	font-size: 32px;
+	}
+table, td, tr {
+	<!-- border: 1px solid black; !-->
+	margin: 20px;
+	padding: 20px;
+	text-align: center;
+}
+td {
+	font-size: 32px;
+	width: 45px;
+
+}
+input {
+	font-size: 32px;
+	width: 160px;
+}
+button {
+	font-size: 32px;
+}
+</style>
+<script>
+var header = '<h1 style="background-color:#8888FFAA;font-size:28px;"> &nbspMulitply in Time</h1>';
+var timeoutVar;
+var timerTxt = ['','black']	;
+var tStart, nEntries, resList, entList, timeByNo, nCorrect;
+var timer = 5;
+var wait = 3;
+var N1=4, N2=3;
+function getRandomColor() {
+  var letters = '6789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * letters.length)];
+  }
+  return color;
+}
+function setNo(id, no) {
+	var el = document.getElementById(id);
+	el.innerHTML = ''+no;
+	el.setAttribute('style','background-color:'+getRandomColor()+';');
+}
+function getNo(id, no) {
+	return parseInt(document.getElementById(id).innerHTML);
+}
+function init() {
+	// Execute a function when the user presses a key on the keyboard
+	resList = [];
+	entList = [];
+	timeByNo = [];
+	for(var n1=0; n1<10; n1++) timeByNo.push(0);
+	for(var n1=N1; n1<10; n1++) for(var n2=N2; n2<10; n2++) entList.push(''+n1+n2);
+	nEntries = 0;
+	nCorrect = 0;
+	timerTxt = ['','black'];
+	var input = document.getElementById("ans");
+	input.addEventListener("keypress", function(event) {
+	  // If the user presses the "Enter" key on the keyboard
+	  if (event.key === "Enter") {
+		// Cancel the default action, if needed
+		event.preventDefault();
+		// Trigger the button element with a click
+		document.getElementById("okBtn").click();
+	  }
+	});
+
+	reFill();
+}
+function setResultText(txt, color='black') {
+	var el = document.getElementById("result");
+	el.innerHTML = txt;
+	el.setAttribute('style',"color:"+color+";font-size:24px;");
+}
+function setResult(isCorrect=true, txt='') {
+	txt = '('+txt+', '+entList.length+' more)';
+	if (isCorrect) {
+		timerTxt = [txt, 'green'];
+		// setResultText("Correct "+txt, 'green');
+	} else {
+		timerTxt = [txt, 'red'];
+		// setResultText("Wrong " + txt, 'red');
+	}
+}
+function ok(showAnswer=false) {
+	var tEnd = new Date();
+	var tDel = Math.round((tEnd - tStart)/1000);
+	var n1 = getNo('n1');
+	var n2 = getNo('n2');
+	var res = false;
+	var ans = -1;
+	var resEl = document.getElementById('ans');
+	if(showAnswer) {
+	    document.getElementById('okBtn').disabled = true;
+		resEl.value = n2*n1;
+		resEl.setAttribute('style','color:red;');
+		// document.getElementById('ans').innerHTML = n2*n1;
+	} else {
+		ans = parseInt(document.getElementById('ans').value);
+		res = ans==(n1*n2);
+	}
+
+	timeByNo[n1] += tDel;
+	setResult(res, ''+tDel+'s');
+	var ent = [n1,n2,ans,tDel];
+	if (!res) resList.push(ent);
+	else nCorrect += 1;
+
+	if(showAnswer) {
+		clearTimeout(timeoutVar);
+		timeoutvar = setTimeout(reFillByTime, wait*1000);
+	} else {
+		clearTimeout(timeoutVar);
+		reFill();
+	}
+}
+function reFillByTime() {
+	reFill(true);
+}
+function countDown(n=0) {
+	if(n!=0) {
+		timerVal = n;
+	}
+	if(timerVal>0) {
+		timeoutVar = setTimeout(countDown, 1000);
+		setResultText('timer :'+timerVal+'  '+timerTxt[0], timerTxt[1]);
+		timerVal -= 1;
+	} else {
+		clearTimeout(timeoutVar);
+		ok(true);
+	}
+}
+function reFill(byTime=false) {
+	if(byTime) clearTimeout(timeoutVar)
+
+	if(entList.length==0) return done();
+
+    document.getElementById('okBtn').disabled = false;
+	if(entList.length==1) nn=0;
+	else nn = Math.floor( (Math.random()*entList.length) );
+	var ent = entList[nn];
+	n1 = ent[0];
+	n2 = ent[1];
+	entList.splice(nn,1);
+	nEntries += 1;
+	document.getElementById('ans').setAttribute('style','color:black;');
+	setNo('n1', n1);
+	setNo('n2', n2);
+	document.getElementById('ans').value = '';
+	tStart = new Date();
+
+	countDown(timer);
+	// timeoutVar = setTimeout(showAnswer, timer*1000);
+}
+function done() {
+	if(timerVal>0) clearTimeout(timeoutVar);
+	var el = document.getElementsByTagName('body')[0];
+	var cnt = [];
+	var tim = []
+	var skipTxt = '</br> <div style="color:red;font-size:32px;"> skipped: '+entList.length +'</div>';
+	for(var n=0;n<10;n++) { cnt.push(0); tim.push(0); }
+
+	var timeSumm = '<table>Time:';
+	for(var n=N1; n<10; n++) {
+		timeSumm += '<tr><td>'+n+'</td><td>'+timeByNo[n]+'s</td></tr>';
+	}
+    timeSumm += '</table>';
+
+	if(resList.length==0) {
+		el.innerHTML = '<div style="color:green;font-size:32px;"> ALL CORRECT !!</div>' + skipTxt + '</br>' + timeSumm;
+	} else {
+		var txt = '<div style="color:red;font-size:32px;">Incorrect:'+resList.length+'/'+nEntries +'</div>' + skipTxt;
+		var badTxt = '<table>';
+		for(var n=0; n<resList.length; n++) {
+			var n1 = resList[n][0];
+			var n2 = resList[n][1]
+			cnt[n1] += 1;
+			tim[n1] += resList[n][3];
+			badTxt += '<tr><td>'+n1+'</td><td>x</td><td>'+n2+'</td><td>=</td><td style="color:green;">'+n1*n2+'</td><td style="color:red;">('+resList[n][2]+')</td></tr>';
+		}
+		badTxt = badTxt + '</table>';
+
+		var countSumm = '<table>';
+		for(var n=0; n<10; n++) {
+			if(cnt[n]>0) countSumm += '<tr><td>'+n+'</td><td>'+cnt[n]+'</td></td></tr>';
+		}
+		countSumm += '</table>';
+
+		el.innerHTML = txt+'</br>'+badTxt+'</br>Incorrect Counts:'+countSumm+'</br>'+timeSumm+'</br>';
+	}
+	el.innerHTML = header+'<button onclick="start()">Re-Start</button></br>' + el.innerHTML;
+}
+function start(update=false){
+	if(update) {
+		timer = document.getElementById("timer").value;
+		wait = document.getElementById("wait").value;
+		N1 = document.getElementById("N1").value;
+		N2 = document.getElementById("N2").value;
+	}
+	document.getElementsByTagName('body')[0].innerHTML = challText;
+	init();
+}
+function baseInit() {
+    document.getElementsByTagName('body')[0].innerHTML = settText;
+}
+var challText = header+'<table width="240px"> <tr ><td style="font-size:48px;font-weight:bold;" id="n1"></td><td>x</td><td style="font-size:48px;font-weight:bold;" id="n2"></td></tr> \
+<tr><td>=</td><td colspan="2"><input type="number" id="ans"></number></td></tr> \
+<tr><td><button onclick="done()">Done</button></td><td colspan="2"><button onclick="ok()" id="okBtn">Ok</button></td></tr> \
+<tr><td colspan="3" id="result"></td></tr> \
+</table>\
+';
+
+var settText = header+'Timer: <input id="timer" value=5 type="number"></input> s</br>\
+Wait: <input id="wait" value=3 type="number"></input> s</br>\
+N1: <input id="N1" value=4 type="number"></input> &nbsp&nbsp&nbsp&nbsp N2: <input id="N2" value=3 type="number"></input> </br>\
+<button onclick="start(true)">Start</button>';
+</script>
+</head>
+<body onload="baseInit()">
+</body>
+</html>

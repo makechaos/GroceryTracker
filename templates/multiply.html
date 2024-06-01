@@ -1,0 +1,146 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+body {
+	font-family: courier;
+	}
+table, td, tr {
+	<!-- border: 1px solid black; !-->
+	margin: 20px;
+	padding: 20px;
+	text-align: center;
+}
+td {
+	font-size: 48px;
+	width: 64px;
+
+}
+input {
+	font-size: 48px;
+	width: 160px;
+}
+button {
+	font-size: 48px;
+}
+</style>
+
+
+<script>
+var tStart = '';
+var resList = [];
+var entList = [];
+var timeByNo = [];
+for(var n1=0; n1<10; n1++) timeByNo.push(0);
+for(var n1=4; n1<10; n1++) for(var n2=3; n2<10; n2++) entList.push(''+n1+n2);
+var nEntries = entList.length;
+function setNo(id, no) {
+	document.getElementById(id).innerHTML = ''+no;
+}
+function getNo(id, no) {
+	return parseInt(document.getElementById(id).innerHTML);
+}
+function init() {
+	// Execute a function when the user presses a key on the keyboard
+	var input = document.getElementById("ans");
+	input.addEventListener("keypress", function(event) {
+	  // If the user presses the "Enter" key on the keyboard
+	  if (event.key === "Enter") {
+		// Cancel the default action, if needed
+		event.preventDefault();
+		// Trigger the button element with a click
+		document.getElementById("okBtn").click();
+	  }
+	});
+
+	reFill();
+}
+function setResult(isCorrect=true, txt='') {
+	var el = document.getElementById("result");
+	txt = txt+'('+entList.length+')';
+	if (isCorrect) {
+		el.innerHTML = "Correct "+txt;
+		el.setAttribute('style',"color:green;font-size:24px;");
+	} else {
+		el.innerHTML = "Wrong " + txt;
+		el.setAttribute('style',"color:red;font-size:24px;");
+	}
+}
+function ok() {
+	var tEnd = new Date();
+	var tDel = Math.round((tEnd - tStart)/1000);
+	var n1 = getNo('n1');
+	var n2 = getNo('n2');
+	var ans = parseInt(document.getElementById('ans').value);
+	var res = ans==(n1*n2);
+	timeByNo[n1] += tDel;
+	setResult(res, ''+tDel+'s');
+	var ent = [n1,n2,ans,tDel];
+	if (!res) resList.push(ent);
+
+	reFill();
+}
+function reFill() {
+	if(entList.length==0) return done();
+
+	// n1 = Math.round( (Math.random()*0.6+0.4)*10);
+	// n2 = Math.round( (Math.random()*0.6+0.4)*10);
+	if(entList.length==1) nn=0;
+	else nn = Math.floor( (Math.random()*entList.length) );
+	var ent = entList[nn];
+	n1 = ent[0];
+	n2 = ent[1];
+	entList.splice(nn,1);
+
+	setNo('n1', n1);
+	setNo('n2', n2);
+	document.getElementById('ans').value = '';
+	tStart = new Date();
+}
+function done() {
+	var el = document.getElementsByTagName('body')[0];
+	var cnt = [];
+	var tim = []
+	for(var n=0;n<10;n++) { cnt.push(0); tim.push(0); }
+	if(resList.length==0) {
+		el.innerHTML = "ALL CORRECT !!";
+		el.setAttribute("style","color:green;font-size:64px;");
+	} else {
+		var txt = 'Incorrect:'+resList.length+'/'+nEntries;
+		var btxt = '<table>';
+		for(var n=0; n<resList.length; n++) {
+			cnt[resList[n][0]] += 1;
+			tim[resList[n][0]] += resList[n][3];
+			btxt += '<tr><td>'+resList[n][0]+'</td><td>x</td><td>'+resList[n][1]+'</td><td>/=</td><td>'+resList[n][2]+'</td></tr>';
+		}
+		btxt = btxt + '</table>';
+
+		var stxt = '<table>';
+		for(var n=0; n<10; n++) {
+			if(cnt[n]>0) stxt += '<tr><td>'+n+'</td><td>'+cnt[n]+'</td></td></tr>';
+		}
+		stxt += '</table>';
+
+		var stxt1 = '<table>';
+		for(var n=4; n<10; n++) {
+			stxt1 += '<tr><td>'+n+'</td><td>'+timeByNo[n]+'s</td></tr>';
+		}
+		stxt1 += '</table>';
+		el.innerHTML = txt+'</br>'+btxt+'</br>Incorrect Counts:'+stxt+'</br>Time:'+stxt1+'</br>';
+		el.setAttribute("style","color:red;font-size:64px;");
+
+	}
+}
+
+</script>
+
+
+</head>
+<body onload="init()">
+<table width="240px"> <tr><td id="n1"></td><td>x</td><td id="n2"></td></tr>
+<tr><td>=</td><td colspan="2"><input type="number" id="ans"></number></td></tr>
+<tr><td><button onclick="done()">Done</button></td><td colspan="2"><button onclick="ok()" id="okBtn">Ok</button></td></tr>
+<tr><td colspan="3" id="result"></td></tr>
+</table>
+</body>
+</html>
