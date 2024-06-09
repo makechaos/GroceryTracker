@@ -563,7 +563,13 @@ import sudokuServer
 
 @app.route('/sudoku/', methods = ['GET'])
 def sudokuLoad():
-  shtml = sudokuServer.fresh()
+  shtml = sudokuServer.fresh('')
+  shtml.replace("{{hostip}}",serverip);
+  return shtml
+
+@app.route('/sudoku/<inp>', methods = ['GET'])
+def sudokuEntry(inp):
+  shtml = sudokuServer.specificEntry(inp)
   shtml.replace("{{hostip}}",serverip);
   return shtml
 
